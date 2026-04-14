@@ -1,10 +1,10 @@
-// Base API Configuration
+
 let API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 const ENV = process.env.NODE_ENV;
 
 switch (ENV) {
     case "production":
-        // Allow environment variable to override even in production
+
         API_BASE_URL = "http://localhost:5000/api";
         break;
     default:
@@ -13,7 +13,7 @@ switch (ENV) {
 }
 
 
-// Helper to get auth token from localStorage
+
 const getAuthToken = () => {
     if (typeof window !== 'undefined') {
         return localStorage.getItem("jwt_token");
@@ -21,7 +21,7 @@ const getAuthToken = () => {
     return null;
 };
 
-// Base fetch wrapper with auth and error handling
+
 const apiRequest = async (endpoint, options = {}) => {
     const token = getAuthToken();
 
@@ -66,7 +66,7 @@ const apiRequest = async (endpoint, options = {}) => {
     return response.json();
 };
 
-// API methods
+
 export const api = {
     get: (endpoint, options = {}) => {
         let url = endpoint;

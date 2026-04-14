@@ -38,16 +38,16 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex flex-row bg-black text-white font-sans overflow-hidden">
-      {/* Left Half: Form */}
+
       <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 lg:p-16 overflow-y-auto">
         <div className="w-full max-w-[440px] space-y-8 my-auto">
-          {/* Header Section */}
+
           <div className="text-left space-y-2">
             <h1 className="text-4xl font-bold tracking-tight font-heading">Set up your workspace</h1>
             <p className="text-white/50 text-base">Start building your collaborative workspace today.</p>
           </div>
 
-          {/* Signup Form */}
+
           <form onSubmit={handleSignup} className="space-y-5">
             <div className="space-y-1.5">
               <label htmlFor="workspaceName" className="text-xs font-semibold uppercase tracking-wider text-white/40">
@@ -147,7 +147,7 @@ export default function SignupPage() {
         </div>
       </div>
 
-      {/* Right Half: Image / Visual */}
+
       <div className="hidden lg:flex lg:w-1/2 bg-zinc-900 items-center justify-center p-16 relative">
         <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent z-0"></div>
         <div className="relative z-10 max-w-lg text-left space-y-10">
