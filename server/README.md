@@ -1,6 +1,6 @@
-# Chat Application Server
+# Project Management System Server
 
-This is the backend for the chat application, built with Express, Node.js, and MongoDB.
+This is the backend for the project management application, built with Express, Node.js, and MongoDB.
 
 ## Getting Started
 

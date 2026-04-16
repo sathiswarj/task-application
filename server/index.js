@@ -2,7 +2,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
-
+const userRoutes = require('./src/routes/userRoutes');
+const projectRoutes = require('./src/routes/projectRoutes');
+const taskRoutes = require('./src/routes/taskRoutes');
+const commentRoutes = require('./src/routes/commentRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -11,10 +14,6 @@ app.use(cors());
 app.use(express.json());
 
 
-const userRoutes = require('./routes/userRoutes');
-const projectRoutes = require('./routes/projectRoutes');
-const taskRoutes = require('./routes/taskRoutes');
-const commentRoutes = require('./routes/commentRoutes');
 
 
 app.get('/', (req, res) => {

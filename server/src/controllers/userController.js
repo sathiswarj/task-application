@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { sendWelcomeEmail } = require('../utils/email');
 
 exports.getUsers = async (req, res) => {
     try {
@@ -30,6 +31,10 @@ exports.signup = async (req, res) => {
         });
 
         await newUser.save();
+        
+        // Send welcome email asynchronously so it doesn't delay the response
+        sendWelcomeEmail(newUser.email, newUser.username);
+
         res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
         res.status(400).json({ message: error.message });
