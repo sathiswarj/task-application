@@ -1,6 +1,6 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
-const sendWelcomeEmail = async (userEmail, username) => {
+export const sendWelcomeEmail = async (userEmail: string, username: string): Promise<any> => {
     try {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -46,8 +46,5 @@ const sendWelcomeEmail = async (userEmail, username) => {
         return info;
     } catch (error) {
         console.error('Error sending welcome email:', error);
-
     }
 };
-
-module.exports = { sendWelcomeEmail };

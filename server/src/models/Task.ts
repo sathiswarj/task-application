@@ -1,6 +1,20 @@
-const mongoose = require('mongoose');
+import mongoose, { Schema, Document } from 'mongoose';
 
-const taskSchema = new mongoose.Schema({
+export interface ITask extends Document {
+    title: string;
+    description?: string;
+    status: 'To Do' | 'In Progress' | 'Done';
+    priority: 'Low' | 'Medium' | 'High';
+    project: mongoose.Types.ObjectId;
+    assignee?: mongoose.Types.ObjectId;
+    attachments: {
+        name: string;
+        url: string;
+        fileType: string;
+    }[];
+}
+
+const taskSchema: Schema = new Schema({
     title: {
         type: String,
         required: true,
@@ -21,12 +35,12 @@ const taskSchema = new mongoose.Schema({
         default: 'Medium'
     },
     project: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Project',
         required: true
     },
     assignee: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User'
     },
     attachments: [{
@@ -38,4 +52,4 @@ const taskSchema = new mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('Task', taskSchema);
+export default mongoose.model<ITask>('Task', taskSchema);

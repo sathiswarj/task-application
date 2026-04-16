@@ -1,25 +1,31 @@
-const User = require('../models/User');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const { sendWelcomeEmail } = require('../utils/email');
+import { Request, Response } from 'express';
+import User from '../models/User';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { sendWelcomeEmail } from '../utils/email';
+import { SignupSchema, LoginSchema } from '../schemas/userSchema';
+import { validate } from '../utils/validator';
 
-exports.getUsers = async (req, res) => {
+export const getUsers = async (req: Request, res: Response) => {
     try {
         const users = await User.find().select('-password');
         res.status(200).json(users);
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 };
 
-exports.signup = async (req, res) => {
+export const signup = async (req: Request, res: Response) => {
     try {
         const { username, email, password, role } = req.body;
 
+        const validation = validate(SignupSchema, req.body);
+        if (!validation.isValid) {
+            return res.status(400).json({ message: 'Validation failed', errors: validation.errors });
+        }
 
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ message: 'User already exists' });
-
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -31,19 +37,23 @@ exports.signup = async (req, res) => {
         });
 
         await newUser.save();
-        
-        // Send welcome email asynchronously so it doesn't delay the response
+
         sendWelcomeEmail(newUser.email, newUser.username);
 
         res.status(201).json({ message: 'User created successfully' });
-    } catch (error) {
+    } catch (error: any) {
         res.status(400).json({ message: error.message });
     }
 };
 
-exports.login = async (req, res) => {
+export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
+
+        const validation = validate(LoginSchema, req.body);
+        if (!validation.isValid) {
+            return res.status(400).json({ message: 'Validation failed', errors: validation.errors });
+        }
 
         const user = await User.findOne({ email });
         if (!user) return res.status(404).json({ message: 'User not found' });
@@ -61,7 +71,7 @@ exports.login = async (req, res) => {
             token,
             user: { id: user._id, username: user.username, role: user.role }
         });
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 };
