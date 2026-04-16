@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 
 export default function DashboardPage() {
   const stats = [
@@ -83,13 +84,13 @@ export default function DashboardPage() {
           <h2 className="text-xl font-bold mb-2">Upcoming Deadlines</h2>
           <div className="space-y-3">
             {[
-              { task: 'Update Brand Guidelines', date: 'Tomorrow', urgency: 'High' },
-              { task: 'Client Presentation', date: 'Apr 18', urgency: 'Medium' },
-              { task: 'Quarterly Review', date: 'Apr 22', urgency: 'Normal' },
+              { id: '1', task: 'Update Brand Guidelines', date: 'Tomorrow', urgency: 'High' },
+              { id: '2', task: 'Client Presentation', date: 'Apr 18', urgency: 'Medium' },
+              { id: '3', task: 'Quarterly Review', date: 'Apr 22', urgency: 'Normal' },
             ].map((item, i) => (
-              <div key={i} className="p-4 bg-zinc-900/30 border border-white/5 rounded-xl flex flex-col gap-2">
+              <Link href={`/dashboard/tasks/${item.id}`} key={i} className="p-4 bg-zinc-900/30 border border-white/5 rounded-xl flex flex-col gap-2 hover:bg-zinc-900/50 hover:border-white/20 transition-all cursor-pointer group">
                 <div className="flex justify-between items-start">
-                  <h5 className="text-sm font-bold tracking-tight truncate flex-1">{item.task}</h5>
+                  <h5 className="text-sm font-bold tracking-tight truncate flex-1 group-hover:text-indigo-400 transition-colors">{item.task}</h5>
                   <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-tighter ${
                     item.urgency === 'High' ? 'bg-red-500/10 text-red-400' :
                     item.urgency === 'Medium' ? 'bg-orange-500/10 text-orange-400' : 'bg-blue-500/10 text-blue-400'
@@ -103,7 +104,7 @@ export default function DashboardPage() {
                   </svg>
                   <span className="text-[10px] font-medium">{item.date}</span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

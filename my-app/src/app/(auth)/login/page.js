@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authService } from '../../../services/auth.service';
@@ -11,6 +11,13 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('jwt_token');
+    if (token) {
+      router.push('/dashboard');
+    }
+  }, [router]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
