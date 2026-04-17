@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import User from '../models/User';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { sendWelcomeEmail } from '../utils/email';
+import { sendWelcomeEmail, sendInviteEmail } from '../utils/email';
 import { SignupSchema, LoginSchema } from '../schemas/userSchema';
 import { validate } from '../utils/validator';
 
@@ -21,11 +21,15 @@ export const signup = async (req: Request, res: Response) => {
 
         const validation = validate(SignupSchema, req.body);
         if (!validation.isValid) {
+            console.log('Signup validation failed:', validation.errors);
             return res.status(400).json({ message: 'Validation failed', errors: validation.errors });
         }
 
         const userExists = await User.findOne({ email });
-        if (userExists) return res.status(400).json({ message: 'User already exists' });
+        if (userExists) return res.status(400).json({ message: 'Email is already registered' });
+
+        const usernameExists = await User.findOne({ username });
+        if (usernameExists) return res.status(400).json({ message: 'Username is already taken' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -42,7 +46,8 @@ export const signup = async (req: Request, res: Response) => {
 
         res.status(201).json({ message: 'User created successfully' });
     } catch (error: any) {
-        res.status(400).json({ message: error.message });
+        console.error('Signup error:', error);
+        res.status(500).json({ message: 'Internal server error', detail: error.message });
     }
 };
 
@@ -71,6 +76,22 @@ export const login = async (req: Request, res: Response) => {
             token,
             user: { id: user._id, username: user.username, role: user.role }
         });
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const inviteUser = async (req: Request, res: Response) => {
+    try {
+        const { email, role, inviterName } = req.body;
+        
+        if (!email) {
+            return res.status(400).json({ message: 'Recipient email is required' });
+        }
+
+        await sendInviteEmail(email, inviterName || 'A teammate', role || 'member');
+
+        res.status(200).json({ message: 'Invitation sent successfully' });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }

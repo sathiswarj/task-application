@@ -1,8 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { taskService } from '@/services/task.service';
+import { projectService } from '@/services/project.service';
+import { userService } from '@/services/user.service';
 
 export default function NewTaskPage() {
   const router = useRouter();
@@ -14,7 +17,36 @@ export default function NewTaskPage() {
     project: '',
     assignee: ''
   });
+  const [projects, setProjects] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fetchingData, setFetchingData] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [projectsData, usersData] = await Promise.all([
+          projectService.getProjects(),
+          userService.getUsers()
+        ]);
+        setProjects(projectsData);
+        setUsers(usersData);
+
+        // Auto-select first project if available
+        if (projectsData.length > 0) {
+          setFormData(prev => ({ ...prev, project: projectsData[0]._id }));
+        }
+      } catch (err) {
+        console.error('Error fetching projects/users:', err);
+        setError('Failed to load projects or users. Please try again.');
+      } finally {
+        setFetchingData(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -23,17 +55,35 @@ export default function NewTaskPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.project) {
+      setError('Please select a project');
+      return;
+    }
+
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
+    setError('');
+
+    try {
+      await taskService.createTask(formData);
       router.push('/dashboard');
-    }, 1500);
+    } catch (err) {
+      setError(err.message || 'Failed to create task');
+      setLoading(false);
+    }
   };
+
+  if (fetchingData) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+        <div className="w-12 h-12 border-4 border-white/10 border-t-white rounded-full animate-spin"></div>
+        <p className="text-white/40 font-medium">Loading workspace data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
-      
+
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight text-white">Create New Task</h1>
@@ -45,6 +95,12 @@ export default function NewTaskPage() {
           </svg>
         </Link>
       </div>
+
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-6 py-4 rounded-2xl text-sm font-medium animate-in shake duration-500">
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-8 bg-zinc-950/50 border border-white/5 p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
         {/* Decorative Gradient Background */}
@@ -109,26 +165,32 @@ export default function NewTaskPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
               <label htmlFor="project" className="text-[10px] font-extrabold text-white/30 uppercase tracking-[0.2em] ml-1">Project</label>
-              <input
-                type="text"
+              <select
                 id="project"
                 value={formData.project}
                 onChange={handleChange}
-                placeholder="Assign to project..."
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder:text-white/10 focus:outline-none focus:border-white/30 transition-all text-sm font-bold"
-              />
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white appearance-none cursor-pointer focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all text-sm font-bold"
+              >
+                <option value="" disabled className="bg-zinc-900 text-white/20">Select a project</option>
+                {projects.map(p => (
+                  <option key={p._id} value={p._id} className="bg-zinc-900">{p.name || p.title}</option>
+                ))}
+              </select>
             </div>
 
             <div className="space-y-2">
               <label htmlFor="assignee" className="text-[10px] font-extrabold text-white/30 uppercase tracking-[0.2em] ml-1">Assignee</label>
-              <input
-                type="text"
+              <select
                 id="assignee"
                 value={formData.assignee}
                 onChange={handleChange}
-                placeholder="Search team members..."
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder:text-white/10 focus:outline-none focus:border-white/30 transition-all text-sm font-bold"
-              />
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white appearance-none cursor-pointer focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all text-sm font-bold"
+              >
+                <option value="" className="bg-zinc-900 text-white/20">Unassigned</option>
+                {users.map(u => (
+                  <option key={u._id} value={u._id} className="bg-zinc-900">{u.username}</option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
@@ -150,7 +212,7 @@ export default function NewTaskPage() {
               </>
             )}
           </button>
-          
+
           <button
             type="button"
             onClick={() => router.back()}

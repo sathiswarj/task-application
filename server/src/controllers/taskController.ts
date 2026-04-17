@@ -1,10 +1,28 @@
 import { Request, Response } from 'express';
 import Task from '../models/Task';
+import User from '../models/User';
+import Project from '../models/Project';
+import { sendTaskAssignmentEmail } from '../utils/email';
 
 export const createTask = async (req: Request, res: Response) => {
     try {
         const task = new Task(req.body);
         await task.save();
+
+        if (task.assignee) {
+            const assigneeUser = await User.findById(task.assignee);
+            const project = await Project.findById(task.project);
+
+            if (assigneeUser && project) {
+                sendTaskAssignmentEmail(
+                    assigneeUser.email,
+                    assigneeUser.username,
+                    task.title,
+                    project.name
+                );
+            }
+        }
+
         res.status(201).json(task);
     } catch (error: any) {
         res.status(400).json({ message: error.message });

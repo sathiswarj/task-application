@@ -1,0 +1,66 @@
+# TaskFlow Access Control Documentation
+
+This document details the Role-Based Access Control (RBAC) implementation for the TaskFlow application. Our security model ensures that users have appropriate access to resources based on their assigned roles.
+
+## 🔐 Overview
+TaskFlow uses a combination of **JWT (JSON Web Token)** authentication and a **Middleware-based** authorization system. Roles are assigned at the point of invitation or signup and are stored within the User model.
+
+---
+
+## 🎭 User Roles
+
+### 1. Admin (`admin`)
+The Admin role is designed for workspace managers and team leads.
+*   **Purpose**: Workspace administration, team growth, and full oversight.
+*   **Key Capabilities**:
+    *   Invite new users to the platform.
+    *   View all registered users in the workspace.
+    *   Manage all projects and high-level configurations.
+    *   Full access to all API endpoints.
+
+### 2. Member (`member`)
+The Member role is designed for individual contributors and team members.
+*   **Purpose**: Task execution and project collaboration.
+*   **Key Capabilities**:
+    *   Create, view, and update tasks.
+    *   View and collaborate on projects they are part of.
+    *   Update their own profile settings.
+*   **Restrictions**:
+    *   Cannot see the global user directory.
+    *   Cannot invite new members.
+    *   Cannot access administrative endpoints.
+
+---
+
+## 🛠 Security Middleware
+
+We use two primary middleware functions located in [auth.ts](file:///c:/Users/Asus/Pictures/chat/server/src/middleware/auth.ts):
+
+### `protect`
+*   **Function**: Validates the Bearer token in the request header.
+*   **Usage**: Applied to all routes requiring a logged-in session.
+*   **Behavior**: Extracts user ID and Role from the JWT and attaches it to `req.user`.
+
+### `adminOnly`
+*   **Function**: Checks the `req.user.role` after protection.
+*   **Usage**: Applied to sensitive administrative routes.
+*   **Behavior**: Returns `403 Forbidden` if the user role is not `admin`.
+
+---
+
+## 📡 API Permission Matrix
+
+| Endpoint | Method | Role Required | Description |
+| :--- | :--- | :--- | :--- |
+| `/api/users/login` | POST | Public | User authentication |
+| `/api/users/signup` | POST | Public | User registration |
+| `/api/users/` | GET | **Admin** | List all workspace members |
+| `/api/users/invite`| POST | **Admin** | Send invitations to new users |
+| `/api/projects/` | GET/POST | Protected | Manage company projects |
+| `/api/tasks/` | GET/POST | Protected | Manage workspace tasks |
+
+---
+
+## 🚀 Future Roadmap
+*   **Project-Level Roles**: Implementing 'Project Lead' vs 'Project Contributor' roles for more granular control within specific projects.
+*   **Audit Logs**: Tracking administrative actions (like invites and role changes) for security compliance.

@@ -48,7 +48,12 @@ export default function SignupPage() {
         router.push('/login');
       }, 3000);
     } catch (err) {
-      setError(err.message || 'Signup failed. Please try again.');
+      if (err.errors && Array.isArray(err.errors)) {
+        const errorMsgs = err.errors.map(e => `${e.path.replace('/', '')}: ${e.message}`).join(', ');
+        setError(`Validation failed: ${errorMsgs}`);
+      } else {
+        setError(err.message || 'Signup failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

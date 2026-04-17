@@ -52,15 +52,14 @@ const apiRequest = async (endpoint, options = {}) => {
                 localStorage.removeItem("jwt_token");
                 window.location.href = "/login";
             }
-            throw new Error(
-                "Session expired or unauthorized. Redirecting to login...",
-            );
+            throw { message: "Session expired or unauthorized. Redirecting to login..." };
         }
 
-        const error = await response
+        const errorData = await response
             .json()
-            .catch(() => ({ message: "Request failed" }));
-        throw new Error(error.message || `HTTP error! status: ${response.status}`);
+            .catch(() => ({ message: `HTTP error! status: ${response.status}` }));
+        
+        throw errorData;
     }
 
     return response.json();
