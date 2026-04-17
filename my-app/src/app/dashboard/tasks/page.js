@@ -8,8 +8,13 @@ export default function TasksPage() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    setIsAdmin(user?.role === 'admin');
+
     const fetchTasks = async () => {
       try {
         const data = await taskService.getTasks();
@@ -27,9 +32,11 @@ export default function TasksPage() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'To Do': return 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20';
+      case 'Backlog': return 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20';
+      case 'Ready for Dev': return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
       case 'In Progress': return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20';
-      case 'Done': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+      case 'Pending': return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+      case 'Completed': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
       default: return 'bg-white/5 text-white/40 border-white/10';
     }
   };
@@ -54,21 +61,25 @@ export default function TasksPage() {
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
-      
+
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-white">All Tasks</h1>
-          <p className="text-white/40 text-sm">Review and manage tasks across all your projects.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white">{isAdmin ? 'All Tasks' : 'My Tasks'}</h1>
+          <p className="text-white/40 text-sm">
+            {isAdmin ? 'Review and manage tasks across all your projects.' : 'Track and manage your assigned responsibilities.'}
+          </p>
         </div>
-        <Link 
-          href="/dashboard/tasks/new" 
-          className="bg-white hover:bg-zinc-200 text-black px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 active:scale-95 shadow-xl shadow-white/5"
-        >
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" />
-          </svg>
-          <span>Create Task</span>
-        </Link>
+        {isAdmin && (
+          <Link
+            href="/dashboard/tasks/new"
+            className="bg-white hover:bg-zinc-200 text-black px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 active:scale-95 shadow-xl shadow-white/5"
+          >
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Create Task</span>
+          </Link>
+        )}
       </div>
 
       {error && (
@@ -94,7 +105,9 @@ export default function TasksPage() {
               {tasks.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="px-8 py-20 text-center text-white/20 text-sm">
-                    No tasks found. Create one to get started.
+                    {isAdmin
+                      ? "No tasks found across the workspace. Create one to get started."
+                      : "You don't have any tasks assigned to you right now. Take a break!"}
                   </td>
                 </tr>
               ) : (

@@ -19,7 +19,7 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-4xl space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-700">
-      
+
       <div className="space-y-1">
         <h1 className="text-3xl font-bold tracking-tight text-white">Settings</h1>
         <p className="text-white/40 text-sm">Manage your account preferences and application settings.</p>
@@ -30,10 +30,10 @@ export default function SettingsPage() {
           <h3 className="text-lg font-bold text-white uppercase tracking-tight">Profile</h3>
           <p className="text-white/30 text-xs leading-relaxed">This information will be displayed to other team members within the workspace.</p>
         </div>
-        
+
         <div className="md:col-span-2 space-y-8 bg-zinc-950/50 border border-white/5 p-10 rounded-[2.5rem] shadow-2xl overflow-hidden relative">
           <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-indigo-500/5 blur-[80px] pointer-events-none"></div>
-          
+
           <div className="flex items-center gap-6 pb-4 border-b border-white/5 relative z-10">
             <div className="w-24 h-24 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center text-4xl font-bold text-white">
               {user.username?.charAt(0).toUpperCase() || '?'}
@@ -47,23 +47,23 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 relative z-10">
             <div className="space-y-2">
               <label className="text-[10px] font-extrabold text-white/30 uppercase tracking-[0.2em] ml-1">Username</label>
-              <input 
-                type="text" 
-                defaultValue={user.username} 
+              <input
+                type="text"
+                defaultValue={user.username}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder:text-white/10 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all text-sm font-bold"
               />
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-extrabold text-white/30 uppercase tracking-[0.2em] ml-1">Email Address</label>
-              <input 
-                type="email" 
-                defaultValue={user.email} 
+              <input
+                type="email"
+                defaultValue={user.email}
                 disabled
                 className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-white/40 cursor-not-allowed text-sm font-bold"
               />
             </div>
           </div>
-          
+
           <div className="flex justify-end pt-4">
             <button className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-2xl font-bold transition-all shadow-xl shadow-indigo-500/10">Save Changes</button>
           </div>
@@ -75,7 +75,7 @@ export default function SettingsPage() {
           <h3 className="text-lg font-bold text-white uppercase tracking-tight">Notifications</h3>
           <p className="text-white/30 text-xs leading-relaxed">Configure how you want to receive alerts and workspace updates.</p>
         </div>
-        
+
         <div className="md:col-span-2 space-y-6 bg-zinc-950/50 border border-white/5 p-10 rounded-[2.5rem] shadow-2xl">
           {[
             { id: 'email', title: 'Email Notifications', desc: 'Receive important updates and task assignments directly in your inbox.', checked: notifications.email },
@@ -93,14 +93,6 @@ export default function SettingsPage() {
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="pt-10 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div className="space-y-1">
-          <h3 className="text-lg font-bold text-red-500 uppercase tracking-tight">Danger Zone</h3>
-          <p className="text-white/30 text-xs">Irreversible actions related to your account security and data.</p>
-        </div>
-        <button className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 px-8 py-3 rounded-2xl font-bold transition-all text-xs uppercase tracking-widest">Delete Account</button>
       </div>
     </div>
   );

@@ -8,21 +8,29 @@ export default function TeamPage() {
   const [team, setTeam] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const fetchTeam = async () => {
-      try {
-        const data = await userService.getUsers();
-        setTeam(data);
-      } catch (err) {
-        console.error('Error fetching team:', err);
-        setError('Failed to load team members. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
 
-    fetchTeam();
+    if (user && user.role === 'admin') {
+      setIsAdmin(true);
+      const fetchTeam = async () => {
+        try {
+          const data = await userService.getUsers();
+          setTeam(data);
+        } catch (err) {
+          console.error('Error fetching team:', err);
+          setError('Failed to load team members. Please try again.');
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchTeam();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   if (loading) {
@@ -34,16 +42,34 @@ export default function TeamPage() {
     );
   }
 
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6">
+        <div className="w-20 h-20 bg-red-500/10 rounded-3xl flex items-center justify-center text-red-500">
+          <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m0-8V7m0 0a2 2 0 100-4 2 2 0 000 4zm-1 8h2m-2 3h2" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-white uppercase tracking-tight">Access Denied</h2>
+          <p className="text-white/40 max-w-sm mx-auto">This section is restricted to administrators. Please contact your workspace manager for access.</p>
+        </div>
+        <Link href="/dashboard" className="text-indigo-400 font-bold hover:underline">Return to Dashboard</Link>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
-      
+
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight text-white">Team Members</h1>
           <p className="text-white/40 text-sm">Collaborate and manage everyone in your workspace.</p>
         </div>
-        <Link 
-          href="/dashboard/team/invite" 
+        <Link
+          href="/dashboard/team/invite"
           className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 active:scale-95 shadow-xl shadow-indigo-500/10"
         >
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -68,16 +94,15 @@ export default function TeamPage() {
               </div>
               <div className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-500 border-2 border-zinc-950 rounded-full"></div>
             </div>
-            
+
             <div className="space-y-1">
               <h3 className="text-lg font-bold text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{user.username}</h3>
               <p className="text-xs text-white/30 font-medium">{user.email}</p>
             </div>
 
             <div className="pt-2">
-              <span className={`text-[9px] font-extrabold px-3 py-1 rounded-full uppercase tracking-widest ${
-                user.role === 'admin' ? 'bg-indigo-500 text-white' : 'bg-white/5 text-white/40 border border-white/5'
-              }`}>
+              <span className={`text-[9px] font-extrabold px-3 py-1 rounded-full uppercase tracking-widest ${user.role === 'admin' ? 'bg-indigo-500 text-white' : 'bg-white/5 text-white/40 border border-white/5'
+                }`}>
                 {user.role}
               </span>
             </div>

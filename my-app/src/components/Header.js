@@ -1,14 +1,29 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 export default function Header() {
+  const [user, setUser] = useState({ username: '', role: 'member' });
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      setUser(JSON.parse(userStr));
+    }
+  }, []);
+
+  const isAdmin = user.role === 'admin';
+
   return (
     <header className="h-16 border-b border-white/5 bg-black/50 backdrop-blur-xl flex items-center justify-between px-8 sticky top-0 z-40">
       <div className="flex items-center gap-4">
         <h2 className="text-sm font-semibold text-white/90">Main Dashboard</h2>
         <div className="h-4 w-px bg-white/10 mx-2"></div>
+        <span className={`text-[9px] font-extrabold px-2.5 py-1 rounded-md uppercase tracking-widest border ${isAdmin ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-white/5 text-white/40 border-white/5'
+          }`}>
+          {user.role}
+        </span>
       </div>
 
       <div className="flex items-center gap-6">
@@ -31,12 +46,14 @@ export default function Header() {
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-indigo-500 rounded-full border-2 border-black"></span>
           </button>
 
-          <Link href="/dashboard/tasks/new" className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors shadow-lg shadow-indigo-600/20">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" />
-            </svg>
-            <span className="text-xs font-bold">New Task</span>
-          </Link>
+          {isAdmin && (
+            <Link href="/dashboard/tasks/new" className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors shadow-lg shadow-indigo-600/20">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" />
+              </svg>
+              <span className="text-xs font-bold">New Task</span>
+            </Link>
+          )}
         </div>
       </div>
     </header>

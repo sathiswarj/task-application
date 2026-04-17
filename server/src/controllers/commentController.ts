@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
 import Comment from '../models/Comment';
+import { AuthRequest } from '../middleware/auth';
 
-export const addComment = async (req: Request, res: Response) => {
+export const addComment = async (req: AuthRequest, res: Response) => {
     try {
-        const comment = new Comment(req.body);
+        const comment = new Comment({
+            ...req.body,
+            author: req.user?.id
+        });
         await comment.save();
         res.status(201).json(comment);
     } catch (error: any) {

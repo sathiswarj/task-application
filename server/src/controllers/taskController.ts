@@ -3,11 +3,13 @@ import Task from '../models/Task';
 import User from '../models/User';
 import Project from '../models/Project';
 import { sendTaskAssignmentEmail } from '../utils/email';
+import { AuthRequest } from '../middleware/auth';
 
-export const createTask = async (req: Request, res: Response) => {
+export const createTask = async (req: AuthRequest, res: Response) => {
     try {
         const task = new Task(req.body);
         await task.save();
+        // ... (existing email logic)
 
         if (task.assignee) {
             const assigneeUser = await User.findById(task.assignee);
@@ -29,9 +31,16 @@ export const createTask = async (req: Request, res: Response) => {
     }
 };
 
-export const getTasks = async (req: Request, res: Response) => {
+export const getTasks = async (req: AuthRequest, res: Response) => {
     try {
-        const tasks = await Task.find().populate('project assignee');
+        let query = {};
+        
+        // Members only see tasks assigned to them
+        if (req.user?.role !== 'admin') {
+            query = { assignee: req.user?.id };
+        }
+
+        const tasks = await Task.find(query).populate('project assignee');
         res.status(200).json(tasks);
     } catch (error: any) {
         res.status(500).json({ message: error.message });

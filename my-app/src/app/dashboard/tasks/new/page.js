@@ -12,7 +12,7 @@ export default function NewTaskPage() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    status: 'To Do',
+    status: 'Backlog',
     priority: 'Medium',
     project: '',
     assignee: ''
@@ -141,9 +141,11 @@ export default function NewTaskPage() {
                 onChange={handleChange}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white appearance-none cursor-pointer focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all text-sm font-bold"
               >
-                <option value="To Do" className="bg-zinc-900">To Do</option>
+                <option value="Backlog" className="bg-zinc-900">Backlog</option>
+                <option value="Ready for Dev" className="bg-zinc-900">Ready for Dev</option>
                 <option value="In Progress" className="bg-zinc-900">In Progress</option>
-                <option value="Done" className="bg-zinc-900">Done</option>
+                <option value="Pending" className="bg-zinc-900">Pending</option>
+                <option value="Completed" className="bg-zinc-900">Completed</option>
               </select>
             </div>
 

@@ -8,8 +8,13 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    setIsAdmin(user?.role === 'admin');
+
     const fetchProjects = async () => {
       try {
         const data = await projectService.getProjects();
@@ -36,21 +41,23 @@ export default function ProjectsPage() {
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
-      
+
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight text-white">Projects</h1>
           <p className="text-white/40 text-sm">Manage and monitor all your active workspace projects.</p>
         </div>
-        <Link 
-          href="/dashboard/projects/new" 
-          className="bg-white hover:bg-zinc-200 text-black px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 active:scale-95 shadow-xl shadow-white/5"
-        >
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" />
-          </svg>
-          <span>New Project</span>
-        </Link>
+        {isAdmin && (
+          <Link
+            href="/dashboard/projects/new"
+            className="bg-white hover:bg-zinc-200 text-black px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 active:scale-95 shadow-xl shadow-white/5"
+          >
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>New Project</span>
+          </Link>
+        )}
       </div>
 
       {error && (
@@ -68,25 +75,31 @@ export default function ProjectsPage() {
           </div>
           <div className="space-y-2">
             <h3 className="text-xl font-bold text-white">No projects found</h3>
-            <p className="text-white/30 max-w-xs mx-auto text-sm">You haven't created any projects yet. Start by creating your first project to organize your tasks.</p>
+            <p className="text-white/30 max-w-xs mx-auto text-sm">
+              {isAdmin
+                ? "You haven't created any projects yet. Start by creating your first project to organize your tasks."
+                : "You aren't a member of any projects yet. Ask an administrator to add you to a project."}
+            </p>
           </div>
-          <Link 
-            href="/dashboard/projects/new" 
-            className="text-indigo-400 hover:text-indigo-300 font-bold transition-colors text-sm"
-          >
-            Create your first project &rarr;
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/dashboard/projects/new"
+              className="text-indigo-400 hover:text-indigo-300 font-bold transition-colors text-sm"
+            >
+              Create your first project &rarr;
+            </Link>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
-            <div 
-              key={project._id} 
+            <div
+              key={project._id}
               className="bg-zinc-950/50 border border-white/5 p-8 rounded-[2rem] hover:border-white/20 hover:bg-zinc-900/50 transition-all group relative overflow-hidden flex flex-col justify-between min-h-[280px]"
             >
               {/* Subtle Gradient Overlay */}
               <div className="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-indigo-500/5 blur-[60px] pointer-events-none group-hover:bg-indigo-500/10 transition-all duration-500"></div>
-              
+
               <div className="space-y-4 relative z-10">
                 <div className="flex items-center justify-between">
                   <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-400">
@@ -114,7 +127,7 @@ export default function ProjectsPage() {
                   <span className="text-[10px] font-extrabold text-white/20 uppercase tracking-[0.2em]">Owner</span>
                   <span className="text-xs font-bold text-white/60">{project.owner?.username || 'Unknown'}</span>
                 </div>
-                <Link 
+                <Link
                   href={`/dashboard/projects/${project._id}`}
                   className="p-3 bg-white/5 rounded-2xl text-white/40 group-hover:bg-white group-hover:text-black transition-all active:scale-90"
                 >
