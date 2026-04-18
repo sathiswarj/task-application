@@ -58,7 +58,7 @@ const apiRequest = async (endpoint, options = {}) => {
         const errorData = await response
             .json()
             .catch(() => ({ message: `HTTP error! status: ${response.status}` }));
-        
+
         throw errorData;
     }
 

@@ -4,6 +4,11 @@ export interface IComment extends Document {
     content: string;
     task: mongoose.Types.ObjectId;
     author: mongoose.Types.ObjectId;
+    parentComment?: mongoose.Types.ObjectId;
+    reactions: Array<{
+        emoji: string;
+        users: mongoose.Types.ObjectId[];
+    }>;
 }
 
 const commentSchema: Schema = new Schema({
@@ -21,7 +26,18 @@ const commentSchema: Schema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    }
+    },
+    parentComment: {
+        type: Schema.Types.ObjectId,
+        ref: 'Comment',
+        default: null
+    },
+    reactions: [
+        {
+            emoji: String,
+            users: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+        }
+    ]
 }, {
     timestamps: true
 });
